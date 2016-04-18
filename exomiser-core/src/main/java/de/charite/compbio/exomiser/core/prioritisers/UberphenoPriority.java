@@ -9,8 +9,8 @@ import java.util.Set;
 
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
-import similarity.concepts.ResnikSimilarity;
-import similarity.objects.InformationContentObjectSimilarity;
+import hpo.similarity.concepts.ResnikSimilarity;
+import hpo.similarity.objects.InformationContentObjectSimilarity;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 import de.charite.compbio.exomiser.core.model.Gene;

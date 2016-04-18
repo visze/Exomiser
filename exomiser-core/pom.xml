@@ -55,9 +55,9 @@
             <version>1.2.3</version>
         </dependency>
         <dependency>
-            <groupId>de.sonumina</groupId>
-            <artifactId>javautil</artifactId>
-            <version>0.0.1</version>
+            <groupId>javautil_pheno</groupId>
+            <artifactId>javautil_pheno</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ontologizer</groupId>

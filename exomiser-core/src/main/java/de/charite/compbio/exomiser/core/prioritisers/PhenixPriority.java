@@ -41,9 +41,9 @@ import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import similarity.SimilarityUtilities;
-import similarity.concepts.ResnikSimilarity;
-import similarity.objects.InformationContentObjectSimilarity;
+import hpo.similarity.SimilarityUtilities;
+import hpo.similarity.concepts.ResnikSimilarity;
+import hpo.similarity.objects.InformationContentObjectSimilarity;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**

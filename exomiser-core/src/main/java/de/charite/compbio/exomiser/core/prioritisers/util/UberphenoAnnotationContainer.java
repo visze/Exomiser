@@ -9,7 +9,7 @@ import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import similarity.SimilarityUtilities;
+import hpo.similarity.SimilarityUtilities;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
