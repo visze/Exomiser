@@ -28,6 +28,7 @@ public class PrioritiserOptionMarshaller extends AbstractOptionMarshaller {
 
         prioritiserCliValues.put("hiphive", PriorityType.HIPHIVE_PRIORITY);
         prioritiserCliValues.put("phenix", PriorityType.PHENIX_PRIORITY);
+        prioritiserCliValues.put("phenix2", PriorityType.PHENIX2_PRIORITY);
         prioritiserCliValues.put("phive", PriorityType.PHIVE_PRIORITY);
         prioritiserCliValues.put("exomewalker", PriorityType.EXOMEWALKER_PRIORITY);
         prioritiserCliValues.put("omim", PriorityType.OMIM_PRIORITY);
