@@ -12,6 +12,8 @@ public enum PriorityType {
     EXOMEWALKER_PRIORITY(ScoringMode.RAW_SCORE),
     //Prioritises against human phenotypes A.K.A. "HPO Phenomizer prioritizer"
     PHENIX_PRIORITY(ScoringMode.RAW_SCORE),
+    //sehb: added boqa prioritiser
+    PHENIX2_PRIORITY(ScoringMode.RAW_SCORE),
     //Prioritises against human-mouse phenotype similarities
     PHIVE_PRIORITY(ScoringMode.RAW_SCORE),
     //Prioritises against OMIM data
