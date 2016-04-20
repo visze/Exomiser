@@ -48,15 +48,15 @@ import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
  * Filter variants according to the phenotypic similarity of the specified
- * disease to mouse models disrupting the same gene. We use semantic similarity
- * calculations in the uberpheno.
+ * query to the HPO-annotated disease genes. This is two step procedure<br>
+ * - compute a score (S) using semantic similarity in HPO
+ * - assign a p-value to the obtained score (S)
+ * 
+ * The p-value is then used for ranking.
  *
- * The files required for the constructor of this filter should be downloaded
- * from: {@code http://purl.obolibrary.org/obo/hp/uberpheno/}
- * (HSgenes_crossSpeciesPhenoAnnotation.txt, crossSpeciesPheno.obo)
  *
  * @author Sebastian Koehler
- * @version 0.06 (6 December, 2013)
+ * @version 0.07 (20 April, 2016)
  */
 public class PhenixPriority implements Prioritiser {
 
