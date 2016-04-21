@@ -7,6 +7,8 @@ package de.charite.compbio.exomiser.core.prioritisers;
 
 import de.charite.compbio.exomiser.core.prioritisers.util.DataMatrix;
 import de.charite.compbio.exomiser.core.prioritisers.util.PriorityService;
+
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +41,7 @@ public class PriorityFactoryImpl implements PriorityFactory {
     private DataMatrix randomWalkMatrix;
     @Autowired
     private Path phenixDataDirectory;
+    
 
     /**
      * Returns a Prioritiser of the given type, ready to run according to the
@@ -69,6 +72,8 @@ public class PriorityFactoryImpl implements PriorityFactory {
                 return makeOmimPrioritiser();
             case PHENIX_PRIORITY:
                 return makePhenixPrioritiser(hpoIds);
+            case PHENIX2_PRIORITY:
+                return makePhenix2Prioritiser(hpoIds);
             case HIPHIVE_PRIORITY:
                 return makeHiPhivePrioritiser(hpoIds, new HiPhiveOptions(diseaseId, candidateGene, hiPhiveParams));
             case PHIVE_PRIORITY:
@@ -102,6 +107,22 @@ public class PriorityFactoryImpl implements PriorityFactory {
     public PhenixPriority makePhenixPrioritiser(List<String> hpoIds) {
         boolean symmetric = false;
         PhenixPriority priority = new PhenixPriority(phenixDataDirectory.toString(), hpoIds, symmetric);
+        return priority;
+    }
+    
+    @Override
+    public Phenix2Priority makePhenix2Prioritiser(List<String> hpoIds) {
+    	String phenix2folder = phenixDataDirectory.toString();
+    	if (!phenix2folder.endsWith(File.separatorChar + "")) {
+    		phenix2folder += File.separatorChar;
+        }
+    	
+    	// phenix2 folder is subfolder of phenix folder
+    	phenix2folder = String.format("%s%s", phenix2folder, "phenix2"+File.separatorChar);
+    	String hpoOboFile = String.format("%s%s", phenix2folder, "hp.obo");
+        String hpoGeneAnnotationFile = String.format("%s%s", phenix2folder, "phenotype_annotations_genes.tab");
+    			
+        Phenix2Priority priority = new Phenix2Priority(hpoOboFile,hpoGeneAnnotationFile,hpoIds);
         return priority;
     }
 

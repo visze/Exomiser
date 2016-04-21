@@ -93,6 +93,15 @@ public class PriorityFactoryImplTest {
         Prioritiser prioritiser = instance.makePrioritiser(type, settings);
         assertThat(prioritiser.getPriorityType(), equalTo(type));
     }
+    
+    @Test(expected = RuntimeException.class)
+    public void testmakePrioritiserForPhenix2PriorityThrowsRuntimeExceptionDueToMissingPhenix2Data() {
+        PriorityType type = PriorityType.PHENIX2_PRIORITY;
+        PrioritiserSettings settings = buildValidSettingsWithPrioritiser(type);
+
+        Prioritiser prioritiser = instance.makePrioritiser(type, settings);
+        assertThat(prioritiser.getPriorityType(), equalTo(type));
+    }
 
     @Test
     public void testmakePrioritiserForUberPhenoPriorityReturnsNoneTypePrioritiser() {

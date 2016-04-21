@@ -33,4 +33,6 @@ public interface PriorityFactory {
     public ExomeWalkerPriority makeExomeWalkerPrioritiser(List<Integer> entrezSeedGenes);
 
     public HiPhivePriority makeHiPhivePrioritiser(List<String> hpoIds, HiPhiveOptions hiPhiveOptions);
+
+    public Phenix2Priority makePhenix2Prioritiser(List<String> hpoIds);
 }

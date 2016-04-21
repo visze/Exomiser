@@ -19,38 +19,24 @@
 
 package de.charite.compbio.exomiser.core.prioritisers;
 
-import de.charite.compbio.exomiser.core.model.Gene;
-import de.charite.compbio.exomiser.core.prioritisers.util.ScoreDistribution;
-import de.charite.compbio.exomiser.core.prioritisers.util.ScoreDistributionContainer;
-import drseb.BoqaService;
-import drseb.BoqaService.ResultEntry;
-import hpo.HPOutils;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import ontologizer.go.OBOParser;
-import ontologizer.go.OBOParserException;
-import ontologizer.go.Ontology;
-import ontologizer.go.Term;
-import ontologizer.go.TermContainer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 
-import hpo.similarity.SimilarityUtilities;
-import hpo.similarity.concepts.ResnikSimilarity;
-import hpo.similarity.objects.InformationContentObjectSimilarity;
-import sonumina.math.graph.SlimDirectedGraphView;
+import de.charite.compbio.exomiser.core.model.Gene;
+import drseb.BoqaService;
+import drseb.BoqaService.ResultEntry;
+import ontologizer.go.Ontology;
+import ontologizer.go.Term;
 
 /**
  * Filter variants according to the BOQA-score between given query and HPO-annotated disease genes.
@@ -62,16 +48,7 @@ public class Phenix2Priority implements Prioritiser {
 
     private static final Logger logger = LoggerFactory.getLogger(Phenix2Priority.class);
 
-    /**
-     * The HPO as Ontologizer-Ontology object
-     */
-    private Ontology hpo;
-
-
-    /**
-     * A list of error-messages
-     */
-    private List<String> errorMessages = null;
+    private static final String geneIdPrefix = "ENTREZGENE";
 
 
     /**
@@ -80,35 +57,14 @@ public class Phenix2Priority implements Prioritiser {
      */
     private HashSet<Term> hpoQueryTerms;
 
-    private float DEFAULT_SCORE = 0f;
-
-    private Map<String, List<Term>> geneId2annotations;
-
-    private final ScoreDistributionContainer scoredistributionContainer = new ScoreDistributionContainer();
-
-    private int numberQueryTerms;
-    /**
-     * A counter of the number of genes that could not be found in the database
-     * as being associated with a defined disease gene.
-     */
-    private int offTargetGenes = 0;
-    /**
-     * Total number of genes used for the query, including genes with no
-     * associated disease.
-     */
-    private int analysedGenes;
-
-    /**
-     * Path to the directory that has the files needed to calculate the score
-     * distribution.
-     */
-    private String scoredistributionFolder;
-    /**
-     * Keeps track of the maximum semantic similarity score to date
-     */
-    private double maxBOQAscore = 0d;
-
+	/**
+	 * Proxy to BOQA
+	 */
 	private BoqaService boqaService;
+
+	private int analysedGenes;
+
+	private int numberQueryTerms;
 
     /**
      * Create a new instance of the Phenix2Priority.
@@ -116,10 +72,31 @@ public class Phenix2Priority implements Prioritiser {
      */
     public Phenix2Priority(String hpOboFile, String geneAnnotationFile, List<String> hpoQueryTermIds) {
 
+        /*
+         * Quick sanity check of gene-annotation file:<br>
+         *  - File must exist <br>
+         *  - first line should start with "ENTREZGENE"<br>
+         *  - first line should have 14 elements (tab-sep)
+         */
+        try {
+			String firstLine = Files.readFirstLine(new File(geneAnnotationFile), Charset.defaultCharset());
+			if (!firstLine.startsWith(geneIdPrefix+"\t")) {
+				 throw new PhenixException("Lines of gene-annotation file in Phenix2 must start with "+geneIdPrefix);
+			}
+			if (!(firstLine.split("\t").length==14)) {
+				 throw new PhenixException("Lines of gene-annotation file in Phenix2 must have 14 elements");
+			}
+		} catch (IOException e) {
+			throw new PhenixException("I/O-Problem with gene-annotation file given to Phenix2: "+e.getMessage());
+		}
+        
+        boqaService = new BoqaService(hpOboFile, geneAnnotationFile);
+        
         if (hpoQueryTermIds.isEmpty()) {
             throw new PhenixException("Please supply some HPO terms. PhenIX2 is unable to prioritise genes without these.");
         }
 
+        Ontology hpo = boqaService.getOntology();
         hpoQueryTerms = new HashSet<>();        
         for (String termIdString : hpoQueryTermIds) {
             Term t = hpo.getTermIncludingAlternatives(termIdString);
@@ -130,29 +107,17 @@ public class Phenix2Priority implements Prioritiser {
             }
         }
         numberQueryTerms = hpoQueryTerms.size();
-        
-        /*
-         * Quick sanity check of gene-annotation file:<br>
-         *  - File must exist <br>
-         *  - first line should start with "ENTREZGENE"<br>
-         *  - first line should have 14 elements (tab-sep)
-         */
-        try {
-			String firstLine = Files.readFirstLine(new File(geneAnnotationFile), Charset.defaultCharset());
-			if (!firstLine.startsWith("ENTREZGENE\t")) {
-				 throw new PhenixException("Lines of gene-annotation file in Phenix2 must start with ENTREZGENE");
-			}
-			if (!(firstLine.split("\t").length==14)) {
-				 throw new PhenixException("Lines of gene-annotation file in Phenix2 must have 14 elements");
-			}
-		} catch (IOException e) {
-			throw new PhenixException("I/O-Problem with gene-annotation file given to Phenix2: "+e.getMessage());
-		}
-        
-        boqaService = new BoqaService(hpOboFile, geneAnnotationFile);
     }
 
     /**
+     * STUB CONSTRUCTOR - ONLY USED FOR TESTING PURPOSES TO AVOID NULL POINTERS FROM ORIGINAL CONSTRUCTOR. DO NOT USE FOR PRODUCTION CODE!!!!
+     * @param hpoIds
+     * @param symmetric 
+     */
+    public Phenix2Priority(List<String> hpoQueryTermIds) {
+	}
+
+	/**
      * Flag to output results of filtering with BOQA.
      */
     @Override
@@ -171,74 +136,26 @@ public class Phenix2Priority implements Prioritiser {
     public void prioritizeGenes(List<Gene> genes) {
         analysedGenes = genes.size();
 
-        // TODO ... run boqa and set scores for each Gene-Object
         HashMap<String, ResultEntry> scoredGenes = boqaService.scoreItems(hpoQueryTerms);
+        HashMap<String, Double> geneid2score = new HashMap<>();
+        for (ResultEntry resultEntry : scoredGenes.values()) {
+        	geneid2score.put(resultEntry.getItemRealId(), resultEntry.getScore());
+        }
+        
+        
         for (Gene gene : genes) {
-            Phenix2PriorityResult phenomizerRelScore = scoreVariantHPO(gene);
-            gene.addPriorityResult(phenomizerRelScore);
+        	String geneId = geneIdPrefix+":"+gene.getEntrezGeneID();
+        	if (geneid2score.containsKey(geneId)) {
+        		Phenix2PriorityResult phenix2result = new Phenix2PriorityResult(geneid2score.get(geneId));
+        		gene.addPriorityResult(phenix2result);
+        	}
+        	else {
+        		Phenix2PriorityResult phenix2result = new Phenix2PriorityResult(0);
+        		gene.addPriorityResult(phenix2result);
+        	}
         }
-        normalizeBoqaScores(genes);
     }
 
-    /**
-     * The gene relevance scores are to be normalized to lie between zero and
-     * one. This function, which relies upon the variable {@link #maxBOQAscore}
-     * being set in {@link #scoreVariantHPO(Gene)}, divides each score by
-     * {@link #maxBOQAscore}, which has the effect of putting the BOQA scores
-     * in the range [0..1].
-     */
-    private void normalizeBoqaScores(List<Gene> genes) {
-        if (maxBOQAscore < 1) {
-            return;
-        }
-        Phenix2PriorityResult.setNormalizationFactor(1d / maxBOQAscore);
-    }
-
-    /**
-     * @param gene A {@link exomizer.exome.Gene Gene} whose score is to be
-     * determined.
-     */
-    private Phenix2PriorityResult scoreVariantHPO(Gene gene) {
-
-    	System.err.println("to be implemented!");
-    	return null;
-//        int entrezGeneId = gene.getEntrezGeneID();
-//        String entrezGeneIdString = entrezGeneId + "";
-//
-//        if (!geneId2annotations.containsKey(entrezGeneIdString)) {
-//            //System.err.println("INVALID GENE GIVEN (will set to default-score): Entrez ID: " + g.getEntrezGeneID() + " / " + g.getGeneSymbol());
-//            this.offTargetGenes++;
-//            return new PhenixPriorityResult(DEFAULT_SCORE);
-//        }
-//
-//        List<Term> annotationsOfGene = geneId2annotations.get(entrezGeneIdString);
-//
-//        double similarityScore = similarityMeasure.computeObjectSimilarity( (ArrayList<Term>) hpoQueryTerms, (ArrayList<Term>) annotationsOfGene);
-//        if (similarityScore > maxSemSim) {
-//            maxSemSim = similarityScore;
-//        }
-//        if (Double.isNaN(similarityScore)) {
-//            errorMessages.add("Error: score was NAN for gene:" + gene + " : " + hpoQueryTerms + " <-> " + annotationsOfGene);
-//        }
-//
-//        ScoreDistribution scoreDist = scoredistributionContainer.getDistribution(entrezGeneIdString, numberQueryTerms, symmetric,
-//                scoredistributionFolder);
-//
-//	// get the pvalue
-//        double rawPvalue;
-//        if (scoreDist == null) {
-//            return new PhenixPriorityResult(DEFAULT_SCORE);
-//        } else {
-//            rawPvalue = scoreDist.getPvalue(similarityScore, 1000.);
-//            rawPvalue = Math.log(rawPvalue) * -1.0; /* Negative log of p value : most significant get highest score */
-//
-//            if (rawPvalue > maxNegLogP) {
-//                maxNegLogP = rawPvalue;
-//            }
-//        }
-//
-//        return new PhenixPriorityResult(rawPvalue, similarityScore);
-    }
 
 
     private static class PhenixException extends RuntimeException {

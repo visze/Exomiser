@@ -31,6 +31,11 @@ public class NoneTypePriorityFactoryStub implements PriorityFactory {
     public PhenixPriority makePhenixPrioritiser(List<String> hpoIds) {
         return new PhenixPriority(hpoIds, true);
     }
+    
+    @Override
+    public Phenix2Priority makePhenix2Prioritiser(List<String> hpoIds) {
+        return new Phenix2Priority(hpoIds);
+    }
 
     @Override
     public PhivePriority makePhivePrioritiser(List<String> hpoIds) {
