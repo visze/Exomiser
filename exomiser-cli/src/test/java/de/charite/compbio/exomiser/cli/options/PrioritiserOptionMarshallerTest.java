@@ -89,6 +89,12 @@ public class PrioritiserOptionMarshallerTest {
     }
     
     @Test
+    public void testApplyValuesToSettingsBuilder_phenix2() {
+        Settings settings = applyValueAndBuildSettings("phenix2");
+        assertThat(settings.getPrioritiserType(), equalTo(PriorityType.PHENIX2_PRIORITY));
+    }
+    
+    @Test
     public void testApplyValuesToSettingsBuilder_phive() {
         Settings settings = applyValueAndBuildSettings("phive");
         assertThat(settings.getPrioritiserType(), equalTo(PriorityType.PHIVE_PRIORITY));
