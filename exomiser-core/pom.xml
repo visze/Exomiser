@@ -67,7 +67,7 @@
         <dependency>
             <groupId>boqa</groupId>
             <artifactId>boqa</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version> 
         </dependency>
 
         <!--Thymeleaf is a templating engine used for creating the HTML results pages -->

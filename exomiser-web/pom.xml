@@ -36,10 +36,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--path to where the database and other resources are found in exomiser.properties-->
-        <data.dir>C:/Users/jj8/Documents/exomiser-cli-4.0.0/data</data.dir>
+        <data.dir>/Users/sebastiankohler/Data/exomiser/exomiser-cli-7.2.1/data</data.dir>
         <warName>exomiser</warName>
     </properties>
 
+    <!-- add here new profile for charite -->
     <profiles>
         <profile>
             <id>sanger</id>
