@@ -20,20 +20,19 @@
 package de.charite.compbio.exomiser.core.model.pathogenicity;
 
 /**
- * Enum representing the pathogenicity prediction method/database used to
- * calculate a given score.
- *
+ * REMM info - see {@link ...}
+ * 
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
-public enum PathogenicitySource {
-    //variant type is from Jannovar
-    VARIANT_TYPE,
-    //these guys are calculated from other sources
-    ESE,
-    POLYPHEN,
-    MUTATION_TASTER,
-    SIFT,
-    CADD,
-    REMM;
+public class ESEScore extends BasePathogenicityScore {
+        
+    public ESEScore(float score) {
+        super(score, PathogenicitySource.ESE);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ESE: %.3f", score);
+    }
     
 }

@@ -47,7 +47,7 @@ public class PathogenicityData {
     }
 
     public PathogenicityData(Set<PathogenicityScore> pathScores) {
-        pathogenicityScores = new EnumMap(PathogenicitySource.class);
+        pathogenicityScores = new EnumMap<PathogenicitySource, PathogenicityScore>(PathogenicitySource.class);
         for (PathogenicityScore pathScore : pathScores) {
             if (pathScore != null) {
                 pathogenicityScores.put(pathScore.getSource(), pathScore);
@@ -75,8 +75,12 @@ public class PathogenicityData {
         return (RemmScore) getPredictedScore(REMM);
     }
     
+    public ESEScore getESEScore() {
+        return (ESEScore) getPredictedScore(ESE);
+    }
+    
     public List<PathogenicityScore> getPredictedPathogenicityScores() {
-        return new ArrayList(pathogenicityScores.values());
+        return new ArrayList<PathogenicityScore>(pathogenicityScores.values());
     }
 
     public boolean hasPredictedScore() {
