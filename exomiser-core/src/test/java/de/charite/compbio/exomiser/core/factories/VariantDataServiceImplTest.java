@@ -77,6 +77,8 @@ public class VariantDataServiceImplTest {
     @Mock
     private CaddDao mockCaddDao;
     @Mock
+    private ESEDao mockESEDao;
+    @Mock
     private RegulatoryFeatureDao mockRegulatoryFeatureDao;
     @Mock
     private TadDao mockTadDao;

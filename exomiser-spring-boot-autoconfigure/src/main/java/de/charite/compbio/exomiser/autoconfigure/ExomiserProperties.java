@@ -39,6 +39,7 @@ public class ExomiserProperties {
     private String caddSnvPath = "";
     private String caddInDelPath = "";
     private String remmPath = "";
+    private String eseMapPath = "ESRseq.tab";
 
     //http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-caching.html
 //    private CacheType cache = CacheType.NONE;
@@ -85,6 +86,11 @@ public class ExomiserProperties {
     public void setH2(ExomiserProperties.H2 h2) {
         this.h2 = h2;
     }
+    
+    public String getESEMapPath() {
+    	return eseMapPath;
+    }
+    
 
     public String getCaddSnvPath() {
         return caddSnvPath;

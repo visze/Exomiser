@@ -59,6 +59,8 @@ public class VariantDataServiceImpl implements VariantDataService {
     private CaddDao caddDao;
     @Resource(name = "remmDao")
     private RemmDao remmDao;
+    @Resource(name = "eseDao")
+    private ESEDao eseDao;
     @Autowired
     private RegulatoryFeatureDao regulatoryFeatureDao;
     @Autowired
@@ -93,11 +95,18 @@ public class VariantDataServiceImpl implements VariantDataService {
         if (variantEffect == VariantEffect.MISSENSE_VARIANT) {
             PathogenicityData missenseScores = pathogenicityDao.getPathogenicityData(variant);
             allPathScores.addAll(missenseScores.getPredictedPathogenicityScores());
+            // ESE score is also avaiable for missense
+            allPathScores.add(eseDao.getPathogenicityData(variant).getESEScore());
         }
         else if (pathogenicitySources.contains(PathogenicitySource.REMM) && variant.isNonCodingVariant()) {
             //REMM is trained on non-coding regulatory bits of the genome, this outperforms CADD for non-coding variants
             PathogenicityData nonCodingScore = remmDao.getPathogenicityData(variant);
             allPathScores.addAll(nonCodingScore.getPredictedPathogenicityScores());
+        }
+        
+        // ESE scores for synonymous variants
+        if (variantEffect == VariantEffect.SYNONYMOUS_VARIANT) {
+        	allPathScores.add(eseDao.getPathogenicityData(variant).getESEScore());
         }
         
         //CADD does all of it although is not as good as REMM for the non-coding regions.

@@ -21,6 +21,8 @@ package de.charite.compbio.exomiser.autoconfigure;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import de.charite.compbio.eselator.core.ESEMap;
 import de.charite.compbio.exomiser.core.Exomiser;
 import de.charite.compbio.exomiser.core.analysis.AnalysisFactory;
 import de.charite.compbio.exomiser.core.prioritisers.util.DataMatrix;
@@ -122,6 +124,29 @@ public class ExomiserAutoConfiguration {
             return new JannovarDataSerializer(ucscFilePath().toString()).load();
         } catch (SerializationException e) {
             throw new RuntimeException("Could not load Jannovar data from " + ucscFilePath(), e);
+        }
+    }
+    
+    /**
+     * Reading the ESE map with the precomuped 6 meres scores.
+     * 
+     * @return Map with precomouted ESE 6meres scores.
+     */
+    @Lazy
+    @Bean
+    public ESEMap eseMap(){
+    	 return getESEMapOrDefaultForProperty(properties.getESEMapPath());
+    }
+    
+    private ESEMap getESEMapOrDefaultForProperty(String pathToESETabFile) {
+        String ESETabPathValue = pathToESETabFile;
+        if (ESETabPathValue.isEmpty()) {
+        	ESETabPathValue = resolveRelativeToDataDir("placeholder.tab").toString();
+        }
+        try {
+            return new ESEMap(ESETabPathValue);
+        } catch (IOException e) {
+            throw new RuntimeException(ESETabPathValue + " file not found. Please check exomiser properties file points to a valid tab file with 6meres and scores.", e);
         }
     }
 

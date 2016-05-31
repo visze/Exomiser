@@ -24,33 +24,37 @@
  */
 package de.charite.compbio.exomiser.core.dao;
 
-import de.charite.compbio.exomiser.core.model.Variant;
-import de.charite.compbio.exomiser.core.model.pathogenicity.RemmScore;
-import de.charite.compbio.exomiser.core.model.pathogenicity.PathogenicityData;
-import de.charite.compbio.jannovar.annotation.VariantEffect;
-import htsjdk.tribble.readers.TabixReader;
-
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import de.charite.compbio.eselator.core.ESEAnalysis;
+import de.charite.compbio.eselator.core.ESEMap;
+import de.charite.compbio.exomiser.core.model.Variant;
+import de.charite.compbio.exomiser.core.model.pathogenicity.ESEScore;
+import de.charite.compbio.exomiser.core.model.pathogenicity.PathogenicityData;
+import de.charite.compbio.jannovar.annotation.VariantEffect;
+
 /**
  *
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 @Component
-public class ESEDao {
+public class ESEDao implements PathogenicityDao {
 
     private final Logger logger = LoggerFactory.getLogger(ESEDao.class);
+    
+    private final ESEMap eseMap;
 
     @Autowired
-    public ESEDao() {
+    public ESEDao(ESEMap eseMap) {
+    	this.eseMap = eseMap;
     }
 
     @Cacheable(value = "ese", key = "#variant.chromosomalVariant")
+    @Override
     public PathogenicityData getPathogenicityData(Variant variant) {
         // ESE can only be used on Missense and Synonymous
         if (variant.getVariantEffect() != VariantEffect.MISSENSE_VARIANT || variant.getVariantEffect() != VariantEffect.SYNONYMOUS_VARIANT) {
@@ -60,10 +64,12 @@ public class ESEDao {
     }
 
     private PathogenicityData processResults(Variant variant) {
-        String chromosome = variant.getChromosomeName();
         int start = variant.getPosition();
         int end = calculateEndPosition(variant);
-        return getRemmData(chromosome, start, end);
+        ESEAnalysis ese = new ESEAnalysis(start, end,variant.getAnnotations().get(0));
+        String wt = ese.getWildtypeSnippet();
+		String mt = ese.getMutantSnippet();
+		return new PathogenicityData(new ESEScore(new Float(eseMap.getESRseqDELTA(wt, mt))));
     }
 
     private int calculateEndPosition(Variant variant) {
@@ -86,30 +92,6 @@ public class ESEDao {
 
     private static boolean isInsertion(Variant variant) {
         return variant.getRef().equals("-");
-    }
-    
-    private PathogenicityData getRemmData(String chromosome, int start, int end) throws NumberFormatException {
-        try {
-            float ncds = Float.NaN;
-            String line;
-//            logger.info("Running tabix with " + chromosome + ":" + start + "-" + end);
-            TabixReader.Iterator results = remmTabixReader.query(chromosome + ":" + start + "-" + end);
-            while ((line = results.next()) != null) {
-                String[] elements = line.split("\t");
-                if (Float.isNaN(ncds)) {
-                    ncds = Float.parseFloat(elements[2]);
-                } else {
-                    ncds = Math.max(ncds, Float.parseFloat(elements[2]));
-                }
-            }
-            //logger.info("Final score " + ncds);
-            if (!Float.isNaN(ncds)) {
-                return new PathogenicityData(new RemmScore(ncds));
-            }
-        } catch (IOException e) {
-            logger.error("Unable to read from REMM tabix file {}", remmTabixReader.getSource(), e);
-        }
-        return new PathogenicityData();
     }
 
 }
