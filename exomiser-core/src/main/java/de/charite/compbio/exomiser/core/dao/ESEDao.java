@@ -39,59 +39,59 @@ import de.charite.compbio.jannovar.annotation.VariantEffect;
 
 /**
  *
- * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
+ * @author Max Schubach <max.schubach@charite.de>
  */
-@Component
-public class ESEDao implements PathogenicityDao {
+@Component("eseDao")
+public class ESEDao {
 
-    private final Logger logger = LoggerFactory.getLogger(ESEDao.class);
-    
-    private final ESEMap eseMap;
+	private final Logger logger = LoggerFactory.getLogger(ESEDao.class);
 
-    @Autowired
-    public ESEDao(ESEMap eseMap) {
-    	this.eseMap = eseMap;
-    }
+	private final ESEMap eseMap;
 
-    @Cacheable(value = "ese", key = "#variant.chromosomalVariant")
-    @Override
-    public PathogenicityData getPathogenicityData(Variant variant) {
-        // ESE can only be used on Missense and Synonymous
-        if (variant.getVariantEffect() != VariantEffect.MISSENSE_VARIANT || variant.getVariantEffect() != VariantEffect.SYNONYMOUS_VARIANT) {
-            return new PathogenicityData();
-        }
-        return processResults(variant);
-    }
+	@Autowired
+	public ESEDao(ESEMap eseMap) {
+		this.eseMap = eseMap;
+	}
 
-    private PathogenicityData processResults(Variant variant) {
-        int start = variant.getPosition();
-        int end = calculateEndPosition(variant);
-        ESEAnalysis ese = new ESEAnalysis(start, end,variant.getAnnotations().get(0));
-        String wt = ese.getWildtypeSnippet();
+	@Cacheable(value = "ese", key = "#variant.chromosomalVariant")
+	public PathogenicityData getPathogenicityData(Variant variant) {
+		// ESE can only be used on Missense and Synonymous
+		if (variant.getVariantEffect() != VariantEffect.MISSENSE_VARIANT
+				|| variant.getVariantEffect() != VariantEffect.SYNONYMOUS_VARIANT) {
+			return new PathogenicityData();
+		}
+		return processResults(variant);
+	}
+
+	private PathogenicityData processResults(Variant variant) {
+		int start = variant.getPosition();
+		int end = calculateEndPosition(variant);
+		ESEAnalysis ese = new ESEAnalysis(start, end, variant.getAnnotations().get(0));
+		String wt = ese.getWildtypeSnippet();
 		String mt = ese.getMutantSnippet();
 		return new PathogenicityData(new ESEScore(new Float(eseMap.getESRseqDELTA(wt, mt))));
-    }
+	}
 
-    private int calculateEndPosition(Variant variant) {
-        int end = variant.getPosition();
-        //these end positions are calculated according to recommendation by Max and Peter who produced the REMM score
-        //don't change this unless they say. 
-        if (isDeletion(variant)) {
-            // test all deleted bases
-            end += variant.getRef().length();
-        } else if (isInsertion(variant)) {
-            // test bases either side of insertion
-            end += 1;
-        }
-        return end;
-    }
+	private int calculateEndPosition(Variant variant) {
+		int end = variant.getPosition();
+		// these end positions are calculated according to recommendation by Max and Peter who produced the REMM score
+		// don't change this unless they say.
+		if (isDeletion(variant)) {
+			// test all deleted bases
+			end += variant.getRef().length();
+		} else if (isInsertion(variant)) {
+			// test bases either side of insertion
+			end += 1;
+		}
+		return end;
+	}
 
-    private static boolean isDeletion(Variant variant) {
-        return variant.getAlt().equals("-");
-    }
+	private static boolean isDeletion(Variant variant) {
+		return variant.getAlt().equals("-");
+	}
 
-    private static boolean isInsertion(Variant variant) {
-        return variant.getRef().equals("-");
-    }
+	private static boolean isInsertion(Variant variant) {
+		return variant.getRef().equals("-");
+	}
 
 }
