@@ -24,15 +24,6 @@
  */
 package de.charite.compbio.exomiser.core.dao;
 
-import de.charite.compbio.exomiser.core.model.pathogenicity.CaddScore;
-import de.charite.compbio.exomiser.core.model.pathogenicity.MutationTasterScore;
-import de.charite.compbio.exomiser.core.model.pathogenicity.PathogenicityData;
-import de.charite.compbio.exomiser.core.model.pathogenicity.PolyPhenScore;
-import de.charite.compbio.exomiser.core.model.pathogenicity.SiftScore;
-import de.charite.compbio.exomiser.core.model.Variant;
-import de.charite.compbio.exomiser.core.model.pathogenicity.PathogenicityScore;
-import de.charite.compbio.jannovar.annotation.VariantEffect;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,6 +36,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+
+import de.charite.compbio.exomiser.core.model.Variant;
+import de.charite.compbio.exomiser.core.model.pathogenicity.CaddScore;
+import de.charite.compbio.exomiser.core.model.pathogenicity.MutationTasterScore;
+import de.charite.compbio.exomiser.core.model.pathogenicity.PathogenicityData;
+import de.charite.compbio.exomiser.core.model.pathogenicity.PolyPhenScore;
+import de.charite.compbio.exomiser.core.model.pathogenicity.SiftScore;
+import de.charite.compbio.jannovar.annotation.VariantEffect;
 
 /**
  *

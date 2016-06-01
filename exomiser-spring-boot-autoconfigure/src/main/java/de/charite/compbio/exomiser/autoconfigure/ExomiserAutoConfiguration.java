@@ -135,21 +135,13 @@ public class ExomiserAutoConfiguration {
     @Lazy
     @Bean
     public ESEMap eseMap(){
-    	 return getESEMapOrDefaultForProperty(properties.getESEMapPath());
+          try {
+              return new ESEMap(properties.getESEMapPath());
+          } catch (IOException e) {
+              throw new RuntimeException(properties.getESEMapPath() + " file not found. Please check exomiser properties file points to a valid tab file with 6meres and scores.", e);
+          }
     }
     
-    private ESEMap getESEMapOrDefaultForProperty(String pathToESETabFile) {
-        String ESETabPathValue = pathToESETabFile;
-        if (ESETabPathValue.isEmpty()) {
-        	ESETabPathValue = resolveRelativeToDataDir("placeholder.tab").toString();
-        }
-        try {
-            return new ESEMap(ESETabPathValue);
-        } catch (IOException e) {
-            throw new RuntimeException(ESETabPathValue + " file not found. Please check exomiser properties file points to a valid tab file with 6meres and scores.", e);
-        }
-    }
-
     /**
      * Optional full system path to CADD InDels.tsv.gz and InDels.tsv.gz.tbi file pair.
      * These can be downloaded from http://cadd.gs.washington.edu/download - v1.3 has been tested.

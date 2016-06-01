@@ -5,20 +5,19 @@
  */
 package de.charite.compbio.exomiser.core.writers;
 
-import de.charite.compbio.exomiser.core.analysis.Analysis;
-import de.charite.compbio.exomiser.core.analysis.TestAnalysisBuilder;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.EnumSet;
 
-import de.charite.compbio.exomiser.core.model.pathogenicity.PathogenicityData;
-import de.charite.compbio.exomiser.core.model.pathogenicity.PolyPhenScore;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.charite.compbio.exomiser.core.analysis.Analysis;
+import de.charite.compbio.exomiser.core.analysis.TestAnalysisBuilder;
 import de.charite.compbio.exomiser.core.factories.TestVariantFactory;
 import de.charite.compbio.exomiser.core.filters.FailFilterResult;
 import de.charite.compbio.exomiser.core.filters.FilterType;
@@ -26,9 +25,10 @@ import de.charite.compbio.exomiser.core.filters.PassFilterResult;
 import de.charite.compbio.exomiser.core.model.Gene;
 import de.charite.compbio.exomiser.core.model.SampleData;
 import de.charite.compbio.exomiser.core.model.VariantEvaluation;
+import de.charite.compbio.exomiser.core.model.pathogenicity.PathogenicityData;
+import de.charite.compbio.exomiser.core.model.pathogenicity.PolyPhenScore;
 import de.charite.compbio.exomiser.core.writers.OutputSettingsImp.OutputSettingsBuilder;
 import de.charite.compbio.jannovar.pedigree.Genotype;
-import java.util.Arrays;
 
 /**
  *
@@ -40,7 +40,7 @@ public class TsvVariantResultsWriterTest {
     private TsvVariantResultsWriter instance;
     
     private static final String VARIANT_DETAILS_HEADER = "#CHROM\tPOS\tREF\tALT\tQUAL\tFILTER\tGENOTYPE\tCOVERAGE\tFUNCTIONAL_CLASS\tHGVS\tEXOMISER_GENE\t";
-    private static final String PATHOGENICITY_SCORES_HEADER = "CADD(>0.483)\tPOLYPHEN(>0.956|>0.446)\tMUTATIONTASTER(>0.94)\tSIFT(<0.06)\tREMM\t";
+    private static final String PATHOGENICITY_SCORES_HEADER = "CADD(>0.483)\tPOLYPHEN(>0.956|>0.446)\tMUTATIONTASTER(>0.94)\tSIFT(<0.06)\tESE\tREMM(>0.5)\t";
     private static final String FREQUENCY_DATA_HEADER =  "DBSNP_ID\tMAX_FREQUENCY\tDBSNP_FREQUENCY\t"
             + "EVS_EA_FREQUENCY\tEVS_AA_FREQUENCY\t"
             + "EXAC_AFR_FREQ\tEXAC_AMR_FREQ\tEXAC_EAS_FREQ\tEXAC_FIN_FREQ\tEXAC_NFE_FREQ\tEXAC_SAS_FREQ\tEXAC_OTH_FREQ\t";
@@ -51,12 +51,12 @@ public class TsvVariantResultsWriterTest {
     
     private static final String PASS_VARIANT_DETAILS = "chr10\t123353298\tG\tC\t2.2\tPASS\t0/1\t0\tmissense_variant\tFGFR2:uc021pzz.1:exon2:c.34C>G:p.(Leu12Val)\tFGFR2";
     private static final String FAIL_VARIANT_DETAILS = "chr7\t155604801\tC\tCTT\t1.0\tTarget\t0/1\t0\tframeshift_variant\tSHH:uc003wmk.1:exon1:c.16_17insAA:p.(Arg6Lysfs*6)\tSHH";
-    private static final String NO_PATH_SCORES = "\t.\t.\t.\t.\t.";
+    private static final String NO_PATH_SCORES = "\t.\t.\t.\t.\t.\t.";
     private static final String NO_FREQUENCY_DATA = "\t.\t0.0\t.\t.\t.\t.\t.\t.\t.\t.\t.\t.";
     private static final String PASS_VARIANT_EXOMISER_SCORES = "\t1.0\t0.0\t0.0\t0.0\n";
     private static final String FAIL_VARIANT_EXOMISER_SCORES = "\t0.95\t0.0\t0.0\t0.0\n";
 
-    private static final String PASS_VARIANT_LINE = PASS_VARIANT_DETAILS + "\t.\t1.0\t.\t.\t." + NO_FREQUENCY_DATA + PASS_VARIANT_EXOMISER_SCORES;
+    private static final String PASS_VARIANT_LINE = PASS_VARIANT_DETAILS + "\t.\t1.0\t.\t.\t.\t." + NO_FREQUENCY_DATA + PASS_VARIANT_EXOMISER_SCORES;
     private static final String FAIL_VARIANT_LINE = FAIL_VARIANT_DETAILS + NO_PATH_SCORES + NO_FREQUENCY_DATA + FAIL_VARIANT_EXOMISER_SCORES;
 
     private OutputSettingsBuilder settingsBuilder;

@@ -57,7 +57,7 @@ public class ESEDao {
 	public PathogenicityData getPathogenicityData(Variant variant) {
 		// ESE can only be used on Missense and Synonymous
 		if (variant.getVariantEffect() != VariantEffect.MISSENSE_VARIANT
-				|| variant.getVariantEffect() != VariantEffect.SYNONYMOUS_VARIANT) {
+				&& variant.getVariantEffect() != VariantEffect.SYNONYMOUS_VARIANT) {
 			return new PathogenicityData();
 		}
 		return processResults(variant);
