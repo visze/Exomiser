@@ -44,9 +44,9 @@ import java.util.Map;
 @Configuration
 public class PriorityFactoryTestConfig {
     
-    @Bean
+	@Bean
     DataSource dataSource() {
-        String url = "jdbc:h2:mem:exomiser;MODE=PostgreSQL;DATABASE_TO_UPPER=FALSE;";
+        String url = "jdbc:h2:mem:exomiser;MODE=PostgreSQL;DATABASE_TO_UPPER=TRUE;";
         String user = "sa";
         String password = "sa";
         

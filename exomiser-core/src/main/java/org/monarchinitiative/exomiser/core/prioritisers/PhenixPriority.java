@@ -21,14 +21,16 @@ package org.monarchinitiative.exomiser.core.prioritisers;
 
 import hpo.HPOutils;
 import ontologizer.go.*;
+import ontologizer.util.OntologyConstants;
+
 import org.monarchinitiative.exomiser.core.model.Gene;
 import org.monarchinitiative.exomiser.core.prioritisers.util.ScoreDistribution;
 import org.monarchinitiative.exomiser.core.prioritisers.util.ScoreDistributionContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import similarity.SimilarityUtilities;
-import similarity.concepts.ResnikSimilarity;
-import similarity.objects.InformationContentObjectSimilarity;
+import hpo.similarity.SimilarityUtilities;
+import hpo.similarity.concepts.ResnikSimilarity;
+import hpo.similarity.objects.InformationContentObjectSimilarity;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 import java.io.BufferedReader;
@@ -186,9 +188,9 @@ public class PhenixPriority implements Prioritiser {
             logger.error("Error parsing HPO OBO file", e);
         }
 
-        TermContainer termContainer = new TermContainer(oboParser.getTermMap(), oboParser.getFormatVersion(), oboParser.getDate());
+        TermContainer termContainer = new TermContainer(oboParser.getTermMap(), oboParser.getFormatVersion(), oboParser.getDataVersion());
         Ontology hpoOntology = new Ontology(termContainer);
-        hpoOntology.setRelevantSubontology(termContainer.get(HPOutils.organAbnormalityRootId).getName());
+        hpoOntology.setRelevantSubontology(termContainer.get(OntologyConstants.organAbnormalityRootId).getName());
         return hpoOntology;
     }
 

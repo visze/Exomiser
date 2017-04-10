@@ -31,6 +31,13 @@
         <version>7.3.0-SNAPSHOT</version>
     </parent>
 
+		<repositories>
+			<repository>
+				<id>compbio</id>
+				<url>http://compbio.charite.de/tl_files/maven</url>
+			</repository>
+		</repositories>
+
     <dependencies>
         <!--Jannovar is used for providing known gene annotations on variants -->
         <dependency>
@@ -62,14 +69,14 @@
             <version>1.2.3</version>
         </dependency>
         <dependency>
-            <groupId>de.sonumina</groupId>
-            <artifactId>javautil</artifactId>
-            <version>0.0.1</version>
+            <groupId>javautil_pheno</groupId>
+            <artifactId>javautil_pheno</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ontologizer</groupId>
             <artifactId>ontologizer</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <!--Thymeleaf is a templating engine used for creating the HTML results pages -->
