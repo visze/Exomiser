@@ -26,8 +26,9 @@ package org.monarchinitiative.exomiser.core.prioritisers;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.jblas.FloatMatrix;
-import org.monarchinitiative.exomiser.core.prioritisers.dao.*;
-import org.monarchinitiative.exomiser.core.prioritisers.util.*;
+import org.monarchinitiative.exomiser.core.prioritisers.util.DataMatrix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
