@@ -59,15 +59,11 @@ public interface Prioritiser extends AnalysisStep {
      * @param genes
      */
     default void prioritizeGenes(List<Gene> genes){
-        Map<String, Optional<PriorityResult>> results = prioritise(genes)
-                .collect(groupingBy(PriorityResult::getGeneSymbol, maxBy(comparingDouble(PriorityResult::getScore))));
+        Map<Integer, Optional<PriorityResult>> results = prioritise(genes)
+                .collect(groupingBy(PriorityResult::getGeneId, maxBy(comparingDouble(PriorityResult::getScore))));
 
-        genes.forEach(gene -> {
-            Optional<PriorityResult> result = results.getOrDefault(gene.getGeneSymbol(), Optional.empty());
-            if (result.isPresent()) {
-                gene.addPriorityResult(result.get());
-            }
-        });
+        genes.forEach(gene -> results.getOrDefault(gene.getEntrezGeneID(), Optional.empty())
+                .ifPresent(gene::addPriorityResult));
     }
 
     //TODO: Enable this. Consider using HumanGeneIdentifier objects as we want to decouple Gene from this package.

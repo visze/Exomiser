@@ -30,8 +30,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.monarchinitiative.exomiser.core.analysis.AnalysisParser.AnalysisFileNotFoundException;
 import org.monarchinitiative.exomiser.core.analysis.AnalysisParser.AnalysisParserException;
-import org.monarchinitiative.exomiser.core.factories.VariantDataServiceStub;
 import org.monarchinitiative.exomiser.core.filters.*;
+import org.monarchinitiative.exomiser.core.genome.VariantDataServiceStub;
 import org.monarchinitiative.exomiser.core.model.GeneticInterval;
 import org.monarchinitiative.exomiser.core.model.frequency.FrequencySource;
 import org.monarchinitiative.exomiser.core.model.pathogenicity.PathogenicitySource;
@@ -129,6 +129,26 @@ public class AnalysisParserTest {
                 + "    analysisMode: FULL \n"
                 + "    ");
         assertThat(analysis.getAnalysisMode(), equalTo(AnalysisMode.FULL));
+    }
+
+    @Test
+    public void testParseAnalysisModeOfInheritanceAutosomalDominant() {
+        Analysis analysis = instance.parseAnalysis(
+                "analysis:\n"
+                        + "    vcf: test.vcf\n"
+                        + "    modeOfInheritance: AUTOSOMAL_DOMINANT \n"
+                        + "    ");
+        assertThat(analysis.getModeOfInheritance(), equalTo(ModeOfInheritance.AUTOSOMAL_DOMINANT));
+    }
+
+    @Test(expected = AnalysisParserException.class)
+    public void testParseAnalysisModeOfInheritanceUserUsesWrongValue() {
+        Analysis analysis = instance.parseAnalysis(
+                "analysis:\n"
+                        + "    vcf: test.vcf\n"
+                        + "    modeOfInheritance: AD\n"
+                        + "    ");
+        assertThat(analysis.getModeOfInheritance(), equalTo(ModeOfInheritance.AUTOSOMAL_DOMINANT));
     }
 
     /**

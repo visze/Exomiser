@@ -43,24 +43,26 @@ import java.util.Map;
  */
 @Configuration
 public class PriorityFactoryTestConfig {
-    
-	@Bean
+
+    private static final Logger logger = LoggerFactory.getLogger(PriorityFactoryTestConfig.class);
+
+    @Bean
     DataSource dataSource() {
-        String url = "jdbc:h2:mem:exomiser;MODE=PostgreSQL;DATABASE_TO_UPPER=TRUE;";
+        String url = "jdbc:h2:mem:exomiser;MODE=PostgreSQL;DATABASE_TO_UPPER=FALSE;";
         String user = "sa";
         String password = "sa";
-        
-        JdbcConnectionPool dataSource = JdbcConnectionPool.create(url, user, password);
-        return dataSource;
+
+        return JdbcConnectionPool.create(url, user, password);
     }
-    
-    @Bean
-    PriorityFactoryImpl priorityFactory() {
-        return new PriorityFactoryImpl();
-    }
+
+//    @Bean
+//    PriorityFactoryImpl priorityFactory() {
+//        return new PriorityFactoryImpl();
+//    }
     
     @Bean
     DataMatrix randomWalkMatrix() {
+        logger.info("Loading random walk matrix bean...");
         Map<Integer, Integer> stubMatrixIndex = new HashMap<>();
         return new DataMatrix(FloatMatrix.EMPTY, stubMatrixIndex);
     }
@@ -69,39 +71,5 @@ public class PriorityFactoryTestConfig {
     Path phenixDataDirectory() {
         return Paths.get("stubPhenixDataDir");
     }
-    
-    @Bean
-    PriorityService priorityService() {
-        return new PriorityService(ontologyService(), modelService(), diseaseDao());
-    }
-    
-    @Bean
-    ModelService modelService() {
-        return new ModelServiceImpl();
-    }
-    
-    @Bean
-    OntologyService ontologyService() {
-        return new OntologyServiceImpl();
-    }
-    
-    @Bean
-    DiseaseDao diseaseDao() {
-        return new DefaultDiseaseDao();
-    }
-    
-    @Bean
-    HumanPhenotypeOntologyDao humanPhenotypeOntologyDao() {
-        return new HumanPhenotypeOntologyDao();
-    }
-    
-    @Bean
-    MousePhenotypeOntologyDao mousePhenotypeOntologyDao() {
-        return new MousePhenotypeOntologyDao();
-    }
-    
-    @Bean
-    ZebraFishPhenotypeOntologyDao zebraFishPhenotypeOntologyDao() {
-        return new ZebraFishPhenotypeOntologyDao();
-    }
+
 }
